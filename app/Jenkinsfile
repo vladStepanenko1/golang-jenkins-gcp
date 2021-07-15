@@ -2,10 +2,23 @@ pipeline{
     agent any
     environment{
         PROJECT_ID = 'flask-app-318214'
+        GC_SDK_IMAGE = 'gcr.io/google.com/cloudsdktool/cloud-sdk:alpine'
         LOCAL_TAG = 'app'
-        REMOTE_TAG = 'eu.gcr.io/$PROJECT_ID/$LOCAL_TAG'
+        REMOTE_TAG = "eu.gcr.io/${PROJECT_ID}/${LOCAL_TAG}"
+        GITHUB_REPO_URL = 'https://github.com/vladStepanenko1/golang-jenkins-gcp.git'
     }
     stages{
+        stage('Clean up'){
+            steps{
+                deleteDir()
+            }
+        }
+        stage('Checkout'){
+            steps{
+                git url: "${GITHUB_REPO_URL}",
+                    branch: 'dev'
+            }
+        }
         stage('Build docker image'){
             steps{
                 echo "===============Building docker image for ${LOCAL_TAG}==============="
@@ -13,8 +26,21 @@ pipeline{
             }
         }
         stage('Push docker image'){
+            agent{
+                docker{
+                    image '$GC_SDK_IMAGE'
+                }
+            }
             steps{
-                echo 'TODO'
+                withCredentials([file(credentialsId: 'jenkins-sa-key', variable: 'GC_KEY')]){
+                    sh '''
+                        cat $GC_KEY | docker login -u _json_key --password-stdin https://eu.gcr.io
+                        gcloud auth activate-service-account --key-file=$GC_KEY
+                        gcloud auth configure-docker
+                        docker tag $LOCAL_TAG $REMOTE_TAG
+                        docker push $REMOTE_TAG
+                    '''
+                }
             }
         }
         stage('Run application'){
