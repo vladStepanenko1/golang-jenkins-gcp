@@ -1,0 +1,5 @@
+project_id       = "flask-app-318214"
+credentials-file = "terraform-sa-key.json"
+region           = "europe-west3"
+zone             = "europe-west3-a"
+jenkins-vm-image = "cos-cloud/cos-89-lts"
