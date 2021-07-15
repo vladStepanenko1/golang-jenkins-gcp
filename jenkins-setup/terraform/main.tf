@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     google = {
-      source = "hashicorp/google"
+      source  = "hashicorp/google"
       version = "3.75.0"
     }
   }
@@ -40,7 +40,7 @@ resource "google_compute_firewall" "jenkins_network_firewall" {
 # jenkins master instance
 resource "google_compute_instance" "jenkins_master_vm" {
   name         = "jenkins-master"
-  machine_type = "e2-micro"
+  machine_type = var.jenkins-vm-machine-type
   zone         = var.zone
 
   boot_disk {
@@ -55,4 +55,6 @@ resource "google_compute_instance" "jenkins_master_vm" {
       nat_ip = google_compute_address.jenkins_master_ip_address.address
     }
   }
+
+  allow_stopping_for_update = true
 }

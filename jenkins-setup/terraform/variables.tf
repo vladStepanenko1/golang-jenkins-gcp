@@ -12,3 +12,5 @@ variable "zone" {
 
 variable "jenkins-vm-image" {}
 
+variable "jenkins-vm-machine-type" {}
+
