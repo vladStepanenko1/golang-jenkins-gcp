@@ -11,7 +11,7 @@ func main() {
 	http.HandleFunc("/", indexHandler)
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8000"
 		log.Printf("Set port = %s", port)
 	}
 
